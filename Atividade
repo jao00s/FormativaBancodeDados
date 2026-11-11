@@ -1,0 +1,328 @@
+CREATE DATABASE Banco_Academia_Movimento_JoaoFrancisco
+GO
+
+USE Banco_Academia_Movimento_JoaoFrancisco
+GO
+
+
+
+CREATE DATABASE Banco_Academia_Movimento_JoaoFrancisco;
+GO
+
+USE Banco_Academia_Movimento_JoaoFrancisco;
+GO
+
+CREATE TABLE Clientes (
+    IdCliente INT PRIMARY KEY IDENTITY(1,1),
+    Nome VARCHAR(100) NOT NULL,
+    CPF VARCHAR(11) NOT NULL UNIQUE,
+    DataNascimento DATE NOT NULL,
+    Telefone VARCHAR(15),
+    DataCadastro DATETIME DEFAULT GETDATE(),
+    Ativo BIT DEFAULT 1,
+    Email VARCHAR(100) NOT NULL UNIQUE
+);
+GO
+
+CREATE TABLE Instrutores (
+    IdInstrutor INT PRIMARY KEY IDENTITY(1,1),
+    Nome VARCHAR(100) NOT NULL,
+    Cref VARCHAR(20) NOT NULL UNIQUE,
+    Email VARCHAR(50) NOT NULL,
+    Especialidade VARCHAR(80) NOT NULL,
+    Ativo BIT DEFAULT 1
+);
+GO
+
+CREATE TABLE Modalidades (
+    IdModalidade INT PRIMARY KEY IDENTITY(1,1),
+    NomeModalidade VARCHAR(80) NOT NULL UNIQUE,
+    Nivel VARCHAR(20) NOT NULL,
+    DuracaoMinutos INT NOT NULL CHECK (DuracaoMinutos > 0),
+    Descricao VARCHAR(250) NOT NULL
+);
+GO
+
+CREATE TABLE Planos (
+    IdPlano INT PRIMARY KEY IDENTITY(1,1),
+    NomePlano VARCHAR(80) NOT NULL UNIQUE,
+    ValorMensal DECIMAL(10,2) NOT NULL CHECK (ValorMensal > 0),
+    DuracaoMeses INT NOT NULL CHECK (DuracaoMeses BETWEEN 1 AND 24),
+    AcessoLivre BIT DEFAULT 0
+);
+GO
+
+CREATE TABLE Matriculas (
+    IdMatricula INT PRIMARY KEY IDENTITY(1,1),
+    IdCliente INT NOT NULL,
+    IdPlano INT NOT NULL,
+    DataInicio DATE NOT NULL,
+    StatusMatricula VARCHAR(15) NOT NULL DEFAULT 'Ativa',
+    Desconto DECIMAL(5,2) DEFAULT 0
+        CHECK (Desconto BETWEEN 0 AND 100),
+    FOREIGN KEY (IdCliente) REFERENCES Clientes(IdCliente),
+    FOREIGN KEY (IdPlano) REFERENCES Planos(IdPlano)
+);
+GO
+
+CREATE TABLE Aulas (
+    IdAula INT PRIMARY KEY IDENTITY(1,1),
+    IdModalidade INT NOT NULL,
+    IdInstrutor INT NOT NULL,
+    DataAula DATE NOT NULL,
+    Horario TIME NOT NULL,
+    Vagas INT NOT NULL CHECK (Vagas BETWEEN 1 AND 50),
+    Sala VARCHAR(30) NOT NULL,
+    FOREIGN KEY (IdModalidade) REFERENCES Modalidades(IdModalidade),
+    FOREIGN KEY (IdInstrutor) REFERENCES Instrutores(IdInstrutor)
+);
+GO
+
+INSERT INTO Instrutores (Nome, Cref, Especialidade, Email)
+VALUES
+('André Silva', 'CREF-SP-1001', 'Musculação', 'andre.silva@movimentomais.com'),
+('Beatriz Costa', 'CREF-SP-1002', 'Pilates', 'beatriz.costa@movimentomais.com'),
+('Caio Mendes', 'CREF-SP-1003', 'Cross Training', 'caio.mendes@movimentomais.com'),
+('Daniela Reis', 'CREF-SP-1004', 'Dança', 'daniela.reis@movimentomais.com'),
+('Eduardo Lima', 'CREF-SP-1005', 'Natação', 'eduardo.lima@movimentomais.com'),
+('Fernanda Alves', 'CREF-SP-1006', 'Yoga', 'fernanda.alves@movimentomais.com'),
+('Gabriel Rocha', 'CREF-SP-1007', 'Funcional', 'gabriel.rocha@movimentomais.com'),
+('Helena Souza', 'CREF-SP-1008', 'Corrida', 'helena.souza@movimentomais.com'),
+('Igor Martins', 'CREF-SP-1009', 'Lutas', 'igor.martins@movimentomais.com'),
+('Juliana Nunes', 'CREF-SP-1010', 'Alongamento', 'juliana.nunes@movimentomais.com');
+GO
+
+INSERT INTO Modalidades
+(NomeModalidade, Nivel, DuracaoMinutos, Descricao)
+VALUES
+('Musculação', 'Todos', 60, 'Treino com pesos e equipamentos.'),
+('Pilates', 'Iniciante', 50, 'Exercícios de equilíbrio e fortalecimento.'),
+('Cross Training', 'Intermediário', 45, 'Circuito de alta intensidade.'),
+('Zumba', 'Todos', 50, 'Aula de dança com ritmos variados.'),
+('Natação', 'Iniciante', 45, 'Fundamentos de natação.'),
+('Yoga', 'Todos', 60, 'Posturas, respiração e concentração.'),
+('Treino Funcional', 'Intermediário', 45, 'Movimentos para condicionamento físico.'),
+('Corrida Orientada', 'Intermediário', 40, 'Técnica e resistência para corrida.'),
+('Muay Thai', 'Iniciante', 60, 'Fundamentos da luta e condicionamento.'),
+('Alongamento', 'Todos', 30, 'Mobilidade e flexibilidade.');
+GO
+
+INSERT INTO Planos
+(NomePlano, ValorMensal, DuracaoMeses, AcessoLivre)
+VALUES
+('Básico Mensal', 89.90, 1, 0),
+('Básico Trimestral', 79.90, 3, 0),
+('Básico Semestral', 74.90, 6, 0),
+('Premium Mensal', 129.90, 1, 1),
+('Premium Trimestral', 119.90, 3, 1),
+('Premium Semestral', 109.90, 6, 1),
+('Estudante Mensal', 69.90, 1, 0),
+('Estudante Anual', 59.90, 12, 0),
+('Família Mensal', 199.90, 1, 1),
+('Corporativo Anual', 99.90, 12, 1);
+GO
+
+INSERT INTO Clientes
+(Nome, CPF, DataNascimento, Telefone, Email)
+VALUES
+('Alice Fernandes', '11122233344', '2004-04-16', '11990001111', 'alice.fernandes@email.com'),
+('Bruno Carvalho', '22233344455', '2001-09-20', '11990002222', 'bruno.carvalho@email.com'),
+('Camila Santos', '33344455566', '1999-01-10', '11990003333', 'camila.santos@email.com'),
+('Diego Oliveira', '44455566677', '2003-07-05', '11990004444', 'diego.oliveira@email.com'),
+('Elisa Martins', '55566677788', '1998-11-23', '11990005555', 'elisa.martins@email.com'),
+('Felipe Rocha', '66677788899', '2002-03-18', '11990006666', 'felipe.rocha@email.com'),
+('Gabriela Lima', '77788899900', '2000-12-09', '11990007777', 'gabriela.lima@email.com'),
+('Henrique Alves', '88899900011', '1997-06-27', '11990008888', 'henrique.alves@email.com'),
+('Isabela Costa', '99900011122', '2005-02-14', '11990009999', 'isabela.costa@email.com'),
+('João Ribeiro', '00011122233', '2001-08-30', '11991112222', 'joao.ribeiro@email.com');
+GO
+
+INSERT INTO Matriculas
+(IdCliente, IdPlano, DataInicio, StatusMatricula, Desconto)
+VALUES
+(1, 7, '2026-02-01', 'Ativa', 0),
+(2, 1, '2026-02-01', 'Ativa', 5),
+(3, 4, '2026-02-02', 'Ativa', 0),
+(4, 2, '2026-02-02', 'Ativa', 10),
+(5, 5, '2026-02-03', 'Ativa', 0),
+(6, 3, '2026-02-03', 'Ativa', 5),
+(7, 8, '2026-02-04', 'Ativa', 0),
+(8, 6, '2026-02-04', 'Ativa', 10),
+(9, 9, '2026-02-05', 'Ativa', 0),
+(10, 10, '2026-02-05', 'Ativa', 0);
+GO
+
+INSERT INTO Aulas
+(IdModalidade, IdInstrutor, DataAula, Horario, Vagas, Sala)
+VALUES
+(1, 1, '2026-03-02', '07:00', 20, 'Sala 1'),
+(2, 2, '2026-03-02', '08:00', 12, 'Sala 2'),
+(3, 3, '2026-03-02', '18:00', 18, 'Sala 3'),
+(4, 4, '2026-03-03', '19:00', 25, 'Sala 4'),
+(5, 5, '2026-03-03', '09:00', 10, 'Piscina'),
+(6, 6, '2026-03-04', '07:30', 15, 'Sala 2'),
+(7, 7, '2026-03-04', '18:30', 20, 'Sala 3'),
+(8, 8, '2026-03-05', '06:30', 30, 'Pista'),
+(9, 9, '2026-03-05', '20:00', 16, 'Sala 4'),
+(10, 10, '2026-03-06', '17:00', 20, 'Sala 1');
+GO
+
+SELECT name AS NomeTabela
+FROM sys.tables
+ORDER BY name;
+GO
+
+SELECT * FROM Clientes;
+SELECT * FROM Instrutores;
+SELECT * FROM Modalidades;
+SELECT * FROM Planos;
+SELECT * FROM Matriculas;
+SELECT * FROM Aulas;
+GO
+
+SELECT Nome, Telefone
+FROM Clientes
+ORDER BY Nome ASC;
+GO
+
+SELECT Nome, Telefone
+FROM Clientes
+WHERE Nome = 'Alice Fernandes';
+GO
+
+UPDATE Clientes
+SET Telefone = '11995554444'
+WHERE Nome = 'Alice Fernandes';
+GO
+
+SELECT Nome, Telefone
+FROM Clientes
+WHERE Nome = 'Alice Fernandes';
+GO
+
+SELECT UPPER(Nome) AS NomeMaiusculo
+FROM Clientes;
+GO
+
+SELECT CONCAT(Nome, ' - ', Telefone) AS ClienteTelefone
+FROM Clientes;
+GO
+
+SELECT COUNT(*) AS TotalClientes
+FROM Clientes;
+GO
+
+SELECT AVG(ValorMensal) AS MediaValores
+FROM Planos;
+GO
+
+SELECT MAX(ValorMensal) AS MaiorValor
+FROM Planos;
+GO
+
+SELECT MIN(ValorMensal) AS MenorValor
+FROM Planos;
+GO
+
+SELECT StatusMatricula, COUNT(*) AS TotalMatriculas
+FROM Matriculas
+GROUP BY StatusMatricula;
+GO
+
+SELECT
+    I.Nome,
+    COUNT(A.IdAula) AS TotalAulas
+FROM Instrutores I
+LEFT JOIN Aulas A
+    ON I.IdInstrutor = A.IdInstrutor
+GROUP BY I.Nome;
+GO
+
+SELECT
+    I.Nome,
+    COUNT(A.IdAula) AS TotalAulas
+FROM Instrutores I
+INNER JOIN Aulas A
+    ON I.IdInstrutor = A.IdInstrutor
+GROUP BY I.Nome
+HAVING COUNT(A.IdAula) >= 1;
+GO
+
+SELECT
+    AcessoLivre,
+    COUNT(*) AS TotalPlanos
+FROM Planos
+GROUP BY AcessoLivre;
+GO
+
+SELECT
+    M.IdMatricula,
+    C.Nome AS NomeCliente,
+    P.NomePlano,
+    M.DataInicio,
+    M.StatusMatricula,
+    M.Desconto
+FROM Matriculas M
+INNER JOIN Clientes C
+    ON M.IdCliente = C.IdCliente
+INNER JOIN Planos P
+    ON M.IdPlano = P.IdPlano;
+GO
+
+SELECT
+    A.IdAula,
+    MO.NomeModalidade,
+    I.Nome AS NomeInstrutor,
+    A.DataAula,
+    A.Horario,
+    A.Vagas,
+    A.Sala
+FROM Aulas A
+INNER JOIN Modalidades MO
+    ON A.IdModalidade = MO.IdModalidade
+INNER JOIN Instrutores I
+    ON A.IdInstrutor = I.IdInstrutor;
+GO
+
+SELECT
+    P.NomePlano,
+    COUNT(M.IdMatricula) AS TotalMatriculas
+FROM Planos P
+LEFT JOIN Matriculas M
+    ON P.IdPlano = M.IdPlano
+GROUP BY P.NomePlano;
+GO
+
+SELECT
+    C.Nome,
+    C.Email,
+    M.IdMatricula,
+    M.StatusMatricula
+FROM Clientes C
+LEFT JOIN Matriculas M
+    ON C.IdCliente = M.IdCliente;
+GO
+
+SELECT
+    MO.NomeModalidade,
+    A.IdAula,
+    A.DataAula,
+    A.Horario
+FROM Modalidades MO
+LEFT JOIN Aulas A
+    ON MO.IdModalidade = A.IdModalidade;
+GO
+
+SELECT
+    A.IdAula,
+    MO.NomeModalidade,
+    MO.Nivel,
+    I.Nome AS NomeInstrutor,
+    A.DataAula,
+    A.Horario
+FROM Aulas A
+INNER JOIN Modalidades MO
+    ON A.IdModalidade = MO.IdModalidade
+INNER JOIN Instrutores I
+    ON A.IdInstrutor = I.IdInstrutor
+WHERE MO.Nivel = 'Intermediário';
